@@ -7,6 +7,7 @@ import re
 import logging
 import os
 from typing import List, Union
+from mysql.connector import Error
 
 import mysql.connector
 from mysql.connector.abstracts import MySQLConnectionAbstract
@@ -67,13 +68,22 @@ def get_logger() -> logging.Logger:
 
 def get_db() -> mysql.connector.connection.MySQLConnection:
     """Connect to the MySQL database and return a connection object."""
-    db_connect = mysql.connector.connect(
-        user=os.getenv('PERSONAL_DATA_DB_USERNAME', 'root'),
-        password=os.getenv('PERSONAL_DATA_DB_PASSWORD', ''),
-        host=os.getenv('PERSONAL_DATA_DB_HOST', 'localhost'),
-        database=os.getenv('PERSONAL_DATA_DB_NAME')
-    )
-    return db_connect
+    db_user = os.getenv('PERSONAL_DATA_DB_USERNAME', 'root')
+    db_password = os.getenv('PERSONAL_DATA_DB_PASSWORD', '')
+    db_host = os.getenv('PERSONAL_DATA_DB_HOST', 'localhost')
+    db_name = os.getenv('PERSONAL_DATA_DB_NAME')
+
+    try:
+        conn = mysql.connector.connect(
+            user=db_user,
+            password=db_password,
+            host=db_host,
+            database=db_name
+        )
+        return conn
+    except Error as e:
+        print(f"Error: {e}")
+        return None
 
 
 def main() -> None:
