@@ -15,7 +15,7 @@ from mysql.connector.pooling import PooledMySQLConnection
 PII_FIELDS = ('name', 'email', 'phone', 'ssn', 'password')
 
 
-def format(fields: List[str], redaction: str, message: str,
+def formater(fields: List[str], redaction: str, message: str,
            separator: str) -> str:
     """The method that filters the fields"""
     for field in fields:
@@ -28,7 +28,7 @@ def format(fields: List[str], redaction: str, message: str,
 def filter_datum(fields: List[str], redaction: str, message: str,
                  separator: str) -> str:
     """The method that filters the fields"""
-    return format(fields, redaction, message, separator)
+    return formater(fields, redaction, message, separator)
 
 
 class RedactingFormatter(logging.Formatter):
@@ -47,11 +47,14 @@ class RedactingFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord) -> str:
         """This is the method that formats a record and obfuscates it"""
-        original_message = record.getMessage()
-        filtered_message = filter_datum(self.fields, self.REDACTION,
-                                        original_message, self.SEPARATOR)
-        record.msg = filtered_message
-        return super().format(record)
+        message = super().format(record)
+        for field in self.fields:
+            message = re.sub(
+                rf'{field}=.+?{self.SEPARATOR}',
+                f'{field}={self.REDACTION}{self.SEPARATOR}',
+                message
+            )
+        return message
 
 
 def get_logger() -> logging.Logger:
