@@ -6,18 +6,29 @@ from datetime import datetime
 import re
 import logging
 import os
+from typing import List, Union
+
 import mysql.connector
+from mysql.connector.abstracts import MySQLConnectionAbstract
+from mysql.connector.pooling import PooledMySQLConnection
 
 PII_FIELDS = ('name', 'email', 'phone', 'ssn', 'password')
 
 
-def filter_datum(fields, redaction, message, separator):
-    """The method that filters the feilds"""
+def format(fields: List[str], redaction: str, message: str,
+           separator: str) -> str:
+    """The method that filters the fields"""
     for field in fields:
         message = re.sub(f"{field}=[^{separator}]*",
                          f"{field}={redaction}",
                          message)
     return message
+
+
+def filter_datum(fields: List[str], redaction: str, message: str,
+                 separator: str) -> str:
+    """The method that filters the fields"""
+    return format(fields, redaction, message, separator)
 
 
 class RedactingFormatter(logging.Formatter):
@@ -55,12 +66,12 @@ def get_logger() -> logging.Logger:
     return logger
 
 
-def get_db():
+def get_db() -> Union[PooledMySQLConnection, MySQLConnectionAbstract]:
     """Connect to the MySQL database and return a connection object."""
-    db_user = os.getenv('PERSONAL_DATA_DB_USERNAME')
-    db_password = os.getenv('PERSONAL_DATA_DB_PASSWORD')
+    db_user = os.getenv('PERSONAL_DATA_DB_USERNAME', 'root')
+    db_password = os.getenv('PERSONAL_DATA_DB_PASSWORD', 'william667')
     db_host = os.getenv('PERSONAL_DATA_DB_HOST', 'localhost')
-    db_name = os.getenv('PERSONAL_DATA_DB_NAME')
+    db_name = os.getenv('PERSONAL_DATA_DB_NAME', 'my_db')
 
     conn = mysql.connector.connect(
         user=db_user,
@@ -71,7 +82,7 @@ def get_db():
     return conn
 
 
-def main():
+def main() -> None:
     """the main file where the program begins"""
     db = get_db()
     cursor = db.cursor(dictionary=True)
