@@ -16,7 +16,7 @@ PII_FIELDS = ('name', 'email', 'phone', 'ssn', 'password')
 
 
 def formater(fields: List[str], redaction: str, message: str,
-           separator: str) -> str:
+             separator: str) -> str:
     """The method that filters the fields"""
     for field in fields:
         message = re.sub(f"{field}=[^{separator}]*",
@@ -32,29 +32,25 @@ def filter_datum(fields: List[str], redaction: str, message: str,
 
 
 class RedactingFormatter(logging.Formatter):
-    """ Redacting Formatter class
-        """
+    """ Redacting Formatter class """
 
     REDACTION = "***"
     FORMAT = "[HOLBERTON] %(name)s %(levelname)s %(asctime)-15s: %(" \
              "message)s"
     SEPARATOR = ";"
 
-    def __init__(self, fields):
+    def __init__(self, fields: List[str]):
         """the init method"""
         super(RedactingFormatter, self).__init__(self.FORMAT)
         self.fields = fields
 
     def format(self, record: logging.LogRecord) -> str:
         """This is the method that formats a record and obfuscates it"""
-        message = super().format(record)
-        for field in self.fields:
-            message = re.sub(
-                rf'{field}=.+?{self.SEPARATOR}',
-                f'{field}={self.REDACTION}{self.SEPARATOR}',
-                message
-            )
-        return message
+        original_message = record.getMessage()
+        filtered_message = filter_datum(self.fields, self.REDACTION,
+                                        original_message, self.SEPARATOR)
+        record.msg = filtered_message
+        return super().format(record)
 
 
 def get_logger() -> logging.Logger:
