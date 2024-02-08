@@ -68,9 +68,9 @@ def get_logger() -> logging.Logger:
 def get_db() -> Union[PooledMySQLConnection, MySQLConnectionAbstract]:
     """Connect to the MySQL database and return a connection object."""
     db_user = os.getenv('PERSONAL_DATA_DB_USERNAME', 'root')
-    db_password = os.getenv('PERSONAL_DATA_DB_PASSWORD', 'william667')
+    db_password = os.getenv('PERSONAL_DATA_DB_PASSWORD', '')
     db_host = os.getenv('PERSONAL_DATA_DB_HOST', 'localhost')
-    db_name = os.getenv('PERSONAL_DATA_DB_NAME', 'my_db')
+    db_name = os.getenv('PERSONAL_DATA_DB_NAME')
 
     conn = mysql.connector.connect(
         user=db_user,
