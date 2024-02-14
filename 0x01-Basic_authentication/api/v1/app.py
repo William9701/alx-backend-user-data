@@ -31,6 +31,7 @@ def not_found(error) -> str:
 
 @app.before_request
 def before_request():
+    """this is the fie before"""
     if auth is None:
         return
     if not auth.require_auth(request.path,
