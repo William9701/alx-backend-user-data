@@ -22,9 +22,9 @@ class BasicAuth(Auth):
             return None
         return authorization_header[6:]
 
-    def decode_base64_authorization_header(self,
-                                           base64_authorization_header:
-                                           str) -> str:
+    def decode_base64_authorization_header(
+            self, base64_authorization_header: str
+    ) -> str:
         """Decode a Base64 string"""
         if base64_authorization_header is None:
             return None
@@ -72,18 +72,27 @@ class BasicAuth(Auth):
         return None
 
     def current_user(self, request=None) -> User:
-        """Retrieve the User instance for a request"""
+        """
+        Retrieve the User instance for a request.
+
+        :param request: Flask request object
+        :type request: flask.Request or None
+        :return: User instance or None if request is None
+        :rtype: User or None
+        """
         if request is None:
             return None
 
         authorization_header = self.authorization_header(request)
-        base64_authorization_header = self.\
-            extract_base64_authorization_header(
-            authorization_header)
-        decoded_base64_authorization_header = self.\
-            decode_base64_authorization_header(
-            base64_authorization_header)
+        base64_authorization_header = (
+            self.extract_base64_authorization_header(authorization_header)
+        )
+        decoded_base64_authorization_header = (
+            self.decode_base64_authorization_header(
+                base64_authorization_header)
+        )
         user_email, user_pwd = self.extract_user_credentials(
-            decoded_base64_authorization_header)
+            decoded_base64_authorization_header
+        )
 
         return self.user_object_from_credentials(user_email, user_pwd)
