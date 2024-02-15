@@ -8,7 +8,6 @@ from models.user import User
 from os import getenv
 
 
-
 @app_views.route('/auth_session/login', methods=['POST'],
                  strict_slashes=False)
 def session_auth():
@@ -33,3 +32,15 @@ def session_auth():
             response.set_cookie(getenv("SESSION_NAME"), session_id)
             return response
     return jsonify({"error": "wrong password"}), 401
+
+
+@app_views.route('/auth_session/logout', methods=['DELETE'],
+                 strict_slashes=False)
+def delete():
+    """delete method"""
+    from api.v1.app import auth
+    v = auth.destroy_session(request)
+    if v is False:
+        abort(404)
+    else:
+        return jsonify({}), 200
