@@ -43,26 +43,29 @@ class DB:
         self._session.refresh(new_user)  # refresh the user instance
         return new_user
 
-    def find_user_by(self, **filters: any) -> User:
+    def find_user_by(self, **kwargs: any) -> User:
         """This method takes in arbitrary keyword arguments and returns
         the first row found in the users table as filtered by the
         method’s input arguments"""
-        session: Session = self._session
-        query = session.query(User)
-
-        for key, value in filters.items():
-            if not hasattr(User,
-                           key) or key not in User.__table__.columns:
-                raise InvalidRequestError(f"Invalid filter: {key}")
-            query = query.filter(getattr(User, key) == value)
-
         try:
-            return query.one()
+            # Construct the query dynamically based on kwargs
+            query = self._session.query(User).filter_by(**kwargs)
+
+            # Get the first result or raise NoResultFound
+            user_instance = query.one()
+
+            return user_instance
+
         except NoResultFound:
-            raise NoResultFound("No user found")
+            # If no results are found, raise NoResultFound
+            raise NoResultFound
 
+        except InvalidRequestError:
+            # If there is an invalid request error, raise it with a
+            # meaningful message
+            raise InvalidRequestError
 
-def update_user(self, user_id: int, **kwargs: Dict[str, Any]) -> None:
+    def update_user(self, user_id: int, **kwargs: Dict[str, Any]) -> None:
         """This is a method that takes as argument a required user_id
         integer and arbitrary keyword arguments, and returns None"""
         user = self.find_user_by(id=user_id)
