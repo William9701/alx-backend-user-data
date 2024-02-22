@@ -2,7 +2,8 @@
 """ Flask module
 """
 from auth import Auth
-from flask import Flask, jsonify, request, make_response, abort, redirect
+from flask import Flask, jsonify, request, make_response, abort, redirect, \
+    url_for
 from sqlalchemy.orm.exc import NoResultFound
 
 AUTH = Auth()
@@ -62,12 +63,12 @@ def login():
 def logout():
     """ logout route"""
     session_id = request.cookies.get('session_id')
-    try:
+    if session_id:
         user = AUTH.get_user_from_session_id(session_id)
-        AUTH.destroy_session(user.id)
-        return redirect('/')
-    except NoResultFound as e:
-        return jsonify({"response": str(e)}), 403
+        if user:
+            AUTH.destroy_session(user.id)
+            return redirect(url_for('index'))
+    abort(403)
 
 
 @app.route('/profile', methods=['GET'], strict_slashes=False)
