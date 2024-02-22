@@ -51,19 +51,19 @@ class DB:
             # Construct the query dynamically based on kwargs
             query = self._session.query(User).filter_by(**kwargs)
 
-            # Get the first result or raise NoResultFound
-            user_instance = query.first()
-
-            return user_instance
-
-        except NoResultFound:
-            # If no results are found, raise NoResultFound
-            raise NoResultFound
-
         except InvalidRequestError:
             # If there is an invalid request error, raise it with a
             # meaningful message
             raise InvalidRequestError
+
+        if query:
+            # Get the first result or raise NoResultFound
+            user_instance = query.one()
+
+            return user_instance
+        else:
+            # If no results are found, raise NoResultFound
+            raise NoResultFound
 
     def update_user(self, user_id: int, **kwargs: Dict[str, Any]) -> None:
         """This is a method that takes as argument a required user_id
