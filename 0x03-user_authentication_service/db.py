@@ -52,7 +52,7 @@ class DB:
             query = self._session.query(User).filter_by(**kwargs)
 
             # Get the first result or raise NoResultFound
-            user_instance = query.one()
+            user_instance = query.first()
 
             return user_instance
 
