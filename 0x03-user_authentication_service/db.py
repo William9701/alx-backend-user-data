@@ -34,13 +34,13 @@ class DB:
             self.__session = DBSession()
         return self.__session
 
-    def add_user(self, email: str, hashed_password: bytes) -> User:
+    def add_user(self, email: str, hashed_password: str) -> User:
         """This is the add user method"""
         new_user = User(email=email, hashed_password=hashed_password)
         self._session.add(new_user)
         self._session.flush()  # flush the changes to the database
-        self._session.refresh(new_user)  # refresh the user instance
         self._session.commit()
+        self._session.refresh(new_user)  # refresh the user instance
         return new_user
 
     def find_user_by(self, **kwargs: Dict[str, Any]) -> User:
