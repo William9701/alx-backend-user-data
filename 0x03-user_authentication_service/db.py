@@ -43,7 +43,7 @@ class DB:
         self._session.refresh(new_user)  # refresh the user instance
         return new_user
 
-    def find_user_by(self, **kwargs: any) -> User:
+    def find_user_by(self, **kwargs) -> User:
         """This method takes in arbitrary keyword arguments and returns
         the first row found in the users table as filtered by the
         method’s input arguments"""
@@ -65,7 +65,7 @@ class DB:
             # If no results are found, raise NoResultFound
             raise NoResultFound
 
-    def update_user(self, user_id: int, **kwargs: Dict[str, Any]) -> None:
+    def update_user(self, user_id: int, **kwargs) -> None:
         """This is a method that takes as argument a required user_id
         integer and arbitrary keyword arguments, and returns None"""
         user = self.find_user_by(id=user_id)
