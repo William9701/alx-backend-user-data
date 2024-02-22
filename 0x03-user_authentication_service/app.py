@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """ Flask module
 """
-from flask import Flask, jsonify, request, make_response, abort, redirect
-from sqlalchemy.exc import NoResultFound
-
 from auth import Auth
+from flask import Flask, jsonify, request, make_response, abort, redirect
+from sqlalchemy.orm.exc import NoResultFound
 
 AUTH = Auth()
 
@@ -106,7 +105,6 @@ def update_password():
                         "message": "Password updated"}), 200
     except ValueError as e:
         return jsonify({"error": str(e)})
-
 
 
 if __name__ == "__main__":
